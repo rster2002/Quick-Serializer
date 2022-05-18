@@ -6,8 +6,7 @@ import Deserializer from "../classes/Deserializer";
 
 export default function Serializable(label: string, dependencies: Function[] = []) {
     return function<T extends Constructor>(constructor: T) {
-        let parentPrototype = Object.getPrototypeOf(constructor);
-        let parentDependencies = parentPrototype[dependenciesSymbol] ?? [];
+        let parentDependencies = constructor[dependenciesSymbol] ?? [];
         
         constructor[labelSymbol] = label;
         constructor[dependenciesSymbol] = [...dependencies, ...parentDependencies];
@@ -18,8 +17,8 @@ export default function Serializable(label: string, dependencies: Function[] = [
             [labelSymbol] = label;
 
             async serialize() {
-                this[serializerSymbol] = this[serializerSymbol] ?? new Serializer(this);
-                return await this[serializerSymbol].result();
+                let serializer = new Serializer(this);
+                return await serializer.result();
             }
 
             static async deserialize(input: SerializationResult) {

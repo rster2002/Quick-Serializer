@@ -14,12 +14,8 @@ export default class Serializer {
     }
 
     async serializeValue(value: any, onlyChildren = false) {
-        if (value === null) {
-            return null;
-        }
-        
-        if (value === undefined) {
-            return undefined;
+        if (value === null || value === undefined) {
+            return value;
         }
         
         let meta = value[metaSymbol] ?? new ClassMeta();
