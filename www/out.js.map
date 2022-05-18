@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["interface Person {\n    name: string\n}\n\nfunction greet(person: Person) {\n    console.log(`Hello ${person.name}`);\n}\n\ngreet({\n    name: \"Alice\",\n});"],
+  "mappings": ";;AAIA,iBAAe,QAAgB;AAC3B,YAAQ,IAAI,SAAS,OAAO;AAAA;AAGhC,QAAM;AAAA,IACF,MAAM;AAAA;",
+  "names": []
+}

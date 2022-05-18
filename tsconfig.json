@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "lib": [
+      "ES6",
+      "DOM"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

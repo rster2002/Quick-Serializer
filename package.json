@@ -1,0 +1,38 @@
+{
+  "name": "typescript-esbuild",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently npm:dev:*",
+    "dev:server": "live-server ./www",
+    "dev:watch": "DEV=true node ./build.cjs",
+    "build": "node ./build.cjs",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rster2002/typescript-esbuild.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rster2002/typescript-esbuild/issues"
+  },
+  "homepage": "https://github.com/rster2002/typescript-esbuild#readme",
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-decorators": "^7.17.12",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/preset-flow": "^7.17.12",
+    "@babel/preset-typescript": "^7.16.0",
+    "@types/jest": "^27.0.2",
+    "babel-jest": "^27.3.1",
+    "concurrently": "^6.4.0",
+    "dotenv": "^10.0.0",
+    "esbuild": "^0.13.13",
+    "jest": "^27.3.1",
+    "live-server": "^1.2.1",
+    "node-fetch": "^3.1.0"
+  }
+}
