@@ -43,6 +43,8 @@ test("Dependencies of child constructors are merged with grand parent constructo
     class C extends B {}
 
     // Then
+    expect(A[dependenciesSymbol]).toEqual([Dep]);
+    expect(B[dependenciesSymbol]).toEqual([Dep]);
     expect(C[dependenciesSymbol]).toEqual([Dep2, Dep]);
 });
 
@@ -56,5 +58,7 @@ test("Dependencies of child constructors are merged with grand parent constructo
     class C extends B {}
 
     // Then
+    expect(A[dependenciesSymbol]).toEqual([Dep]);
+    expect(B[dependenciesSymbol]).toEqual([Dep]);
     expect(C[dependenciesSymbol]).toEqual([Dep2, Dep]);
 });
