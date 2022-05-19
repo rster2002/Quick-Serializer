@@ -4,9 +4,16 @@ import { labelSymbol, metaSymbol, serializableIndicatorSymbol, serializerSymbol 
 import { genId } from "../utils/genId";
 import blobToBase64 from "../utils/blobToBase64";
 import SerializationResult from "../interfaces/SerializationResult";
+import Plugin from "./Plugin";
+
+interface PluginResult {
+    resolved: boolean
+    value: unknown
+}
 
 export default class Serializer {
     private objects: Map<object, SerializedObject> = new Map<object, SerializedObject>();
+    private plugins: Plugin[] = [];
 
     async serializeValue(value: any, onlyChildren = false) {
         if (value === null || value === undefined) {
@@ -36,6 +43,12 @@ export default class Serializer {
             this.objects.set(value, serializedValue);
 
             return { $ref: id };
+        }
+
+        let result = await this.resolvePlugins(value);
+
+        if (result.resolved) {
+            return result.value;
         }
 
         if (Array.isArray(value)) {
@@ -76,6 +89,30 @@ export default class Serializer {
             objects: Array.from(this.objects.values()),
             //@ts-ignore
             value,
+        }
+    }
+
+    private async resolvePlugins(value: unknown): Promise<PluginResult> {
+        let matchingPlugings = this.plugins.filter(plugin => plugin.match(value));
+
+        if (matchingPlugings.length > 1) {
+            console.warn(`Multiple plugins matched for '${value}'. Using the first match.`);
+        }
+
+        let matchedPlugin = matchingPlugings[0];
+
+        if (!matchedPlugin) {
+            return {
+                resolved: false,
+                value: null,
+            }
+        }
+
+        
+
+        return {
+            resolved,
+            value: null,
         }
     }
 }
