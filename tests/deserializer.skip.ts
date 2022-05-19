@@ -1,5 +1,8 @@
 //@ts-nocheck
 
+import Serializable from "../src/decorators/Serializable";
+import Ignore from "../src/decorators/Ignore";
+
 @Serializable("Person")
 class Person {
     relatives: Person[] = [];
