@@ -6,12 +6,7 @@ import blobToBase64 from "../utils/blobToBase64";
 import SerializationResult from "../interfaces/SerializationResult";
 
 export default class Serializer {
-    private readonly initializer: object;
     private objects: Map<object, SerializedObject> = new Map<object, SerializedObject>();
-
-    constructor(initializer: object) {
-        this.initializer = initializer;
-    }
 
     async serializeValue(value: any, onlyChildren = false) {
         if (value === null || value === undefined) {
@@ -74,8 +69,8 @@ export default class Serializer {
         return value;
     }
 
-    async result(): Promise<SerializationResult> {
-        let value = await this.serializeValue(this.initializer);
+    async serialize(initializer: object): Promise<SerializationResult> {
+        let value = await this.serializeValue(initializer);
 
         return {
             objects: Array.from(this.objects.values()),

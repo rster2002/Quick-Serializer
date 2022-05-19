@@ -1,6 +1,7 @@
 //@ts-nocheck
 import Serializable from "../src/decorators/Serializable";
 import Ignore from "../src/decorators/Ignore";
+import Serializer from "../src/classes/Serializer";
 
 @Serializable("Person")
 class Person {
@@ -9,7 +10,7 @@ class Person {
     image: Blob;
     
     @Ignore
-    superSecret: string = "Shh";
+    superSecret: string = "Shh"
 }
 
 @Serializable("Pet")
@@ -30,12 +31,17 @@ class Cat extends Pet {
     }
 }
 
+let serializer;
+beforeEach(() => {
+    serializer = new Serializer();
+});
+
 test("Empty person is serialized correctly", async () => {
     // Given
     let instance = new Person();
     
     // When
-    let serialized = await instance.serialize();
+    let serialized = await serializer.serialize(instance);
     
     // Then
     expect(serialized).not.toBeUndefined();
@@ -54,7 +60,7 @@ test("Ignored field is not included", async () => {
     let instance = new Person();
 
     // When
-    let serialized = await instance.serialize();
+    let serialized = await serializer.serialize(instance);
 
     // Then
     expect(serialized.objects[0]).not.toHaveProperty("superSecret");
@@ -67,7 +73,7 @@ test("Person with relative is serialized correctly", async () => {
     person1.relatives.push(person2);
 
     // When
-    let serialized = await person1.serialize();
+    let serialized = await serializer.serialize(person1);
 
     // Then
     expect(serialized).not.toBeUndefined();
@@ -86,7 +92,7 @@ test("Person with two times the same relative is serialized correctly", async ()
     person1.relatives.push(person2);
 
     // When
-    let serialized = await person1.serialize();
+    let serialized = await serializer.serialize(person1);
 
     // Then
     expect(serialized).not.toBeUndefined();
@@ -104,7 +110,7 @@ test("Person with cat is serialized correctly", async () => {
     person.pet = new Cat("Sammie");
 
     // When
-    let serialized = await person.serialize();
+    let serialized = await serializer.serialize(person);
 
     // Then
     expect(serialized).not.toBeUndefined();
@@ -119,10 +125,36 @@ test("Person with cat is serialized correctly", async () => {
 test("A blob is serialized correctly", async () => {
     // Given
     let person = new Person();
+    person.image = new Blob(["abc"]);
+
+    // When
+    let serialized = await serializer.serialize(person);
+
+    // Then
+    expect(serialized.objects).toHaveLength(1);
+    expect(serialized.objects[0].image).toEqual({
+        $plugin: "Blob",
+        $value: {
+            data: "data:application/octet-stream;base64,YWJj",
+        },
+    });
+});
+
+test("A file is serialized correctly", async () => {
+    // Given
+    let person = new Person();
     person.image = new File(["abc"], "test.txt");
 
     // When
-    let serialized = await person.serialize();
+    let serialized = await serializer.serialize(person);
+
+    // Then
     expect(serialized.objects).toHaveLength(1);
-    expect(serialized.objects[0].image).toBe("data:application/octet-stream;base64,YWJj");
+    expect(serialized.objects[0].image).toEqual({
+        $plugin: "File",
+        $value: {
+            name: "test.txt",
+            data: "data:application/octet-stream;base64,YWJj",
+        },
+    });
 });
