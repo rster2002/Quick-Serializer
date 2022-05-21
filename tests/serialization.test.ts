@@ -2,6 +2,7 @@
 import Serializable from "../src/decorators/Serializable";
 import Ignore from "../src/decorators/Ignore";
 import Serializer from "../src/classes/Serializer";
+import Walker from "./Walker";
 
 let plainObject = {};
 
@@ -82,12 +83,19 @@ test("Person with relative is serialized correctly", async () => {
     // Then
     expect(serialized).not.toBeUndefined();
     expect(serialized.value).not.toBeUndefined();
-    expect(serialized.value.$ref).not.toBeUndefined();
     expect(serialized.objects).toHaveLength(4);
-    expect(serialized.objects[0].$value.relatives).toHaveProperty("$ref");
-    expect(serialized.objects[1].$value).toHaveLength(1);
-    expect(serialized.objects[1].$value[0]).toHaveProperty("$ref");
-    expect(serialized.objects[2].$id).toBe(serialized.objects[1].$value[0].$ref);
+
+    let walker = new Walker(serialized);
+    let serializedPerson = walker.follow(serialized.value);
+    
+    expect(serializedPerson.$value.relatives).toBeRef();
+
+    // expect(serialized.value.$ref).not.toBeUndefined();
+    // expect(serialized.objects).toHaveLength(4);
+    // expect(serialized.objects[0].$value.relatives).toHaveProperty("$ref");
+    // expect(serialized.objects[1].$value).toHaveLength(1);
+    // expect(serialized.objects[1].$value[0]).toHaveProperty("$ref");
+    // expect(serialized.objects[2].$id).toBe(serialized.objects[1].$value[0].$ref);
 });
 
 test("Person with two times the same relative is serialized correctly", async () => {
