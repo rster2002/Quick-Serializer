@@ -8,10 +8,13 @@ export default function Serializable(label: string, dependencies: Function[] = [
         constructor[labelSymbol] = label;
         constructor[dependenciesSymbol] = [...dependencies, ...parentDependencies];
         constructor[serializableIndicatorSymbol] = true;
-
-        return class extends constructor {
-            [serializableIndicatorSymbol] = true;
-            [labelSymbol] = label;
+        
+        //@ts-ignore
+        constructor.addDependencies = function (dependencies: Function[]) {
+            constructor[dependenciesSymbol] = [
+                ...constructor[dependenciesSymbol],
+                ...dependencies,
+            ];
         }
     }
 }

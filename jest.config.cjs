@@ -5,7 +5,7 @@ module.exports = {
     },
     setupFiles: [
         "./tests/setup.js",
-        "./tests/custom-matchers.ts",
+        // "./tests/custom-matchers.ts",
     ],
     transformIgnorePatterns: [],
 }

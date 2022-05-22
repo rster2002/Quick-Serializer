@@ -5,6 +5,7 @@ let d = {};
 @Serializable("i")
 class Person {
     name: string;
+    pet: Cat;
     obj = {
         i: 10,
         a: {b: 20, d},
@@ -17,8 +18,33 @@ class Person {
     }
 }
 
+@Serializable("Cat", [Person])
+class Cat {
+    owner: Person;
+    name: string;
+    
+    constructor(name: string) {
+        this.name = name;
+    }
+}
+
+//@ts-ignore
+Person.addDependencies([Cat]);
+
+window.Person = Person;
+
 let serializer = new Serializer();
 
 let person = new Person("Alice");
+let cat = new Cat("Sammie");
+person.pet = cat;
+cat.owner = person;
 
-serializer.serialize(person).then(console.log);
+person.arr.push(new Person("hi"));
+
+serializer.serialize(person).then(s => {
+    serializer.deserialize(Person, s).then(d => {
+        console.log(d);
+        console.log(serializer);
+    });
+});
