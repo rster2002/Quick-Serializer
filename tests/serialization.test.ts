@@ -14,7 +14,7 @@ class Person {
     pet: Pet = null;
     image: Blob;
     plainObject: object;
-    
+
     @Ignore
     superSecret: string = "Shh"
 }
@@ -23,7 +23,7 @@ class Person {
 class Pet {
     name: string;
     owner: Person;
-    
+
     constructor(name: string) {
         this.name = name;
     }
@@ -32,7 +32,7 @@ class Pet {
 @Serializable("Cat")
 class Cat extends Pet {
     isCute: boolean = true;
-    
+
     constructor(name: string) {
         super(name);
     }
@@ -46,10 +46,10 @@ beforeEach(() => {
 test("Empty person is serialized correctly", async () => {
     // Given
     let instance = new Person();
-    
+
     // When
     let serialized = await serializer.serialize(instance);
-    
+
     // Then
     let walker = new Walker(serialized);
     walker.expectBasics();
@@ -121,7 +121,7 @@ test("Arrays are serialized correctly", async () => {
     // Then
     let walker = new Walker(serialized);
     walker.expectBasics();
-    
+
     expect(walker.value().relatives).toBeRef();
 
     walker.follow(walker.value().relatives);
@@ -145,11 +145,11 @@ test("Person with relative is serialized correctly", async () => {
     expect(serialized.objects).toHaveLength(4);
 
     let walker = new Walker(serialized);
-    walker.expectBasics();    
+    walker.expectBasics();
 
     expect(walker.name()).toBe("Person");
     expect(walker.value().relatives).toBeRef();
-    
+
     walker.follow(walker.value().relatives);
     expect(walker.name()).toBe("$array");
     expect(walker.value()).toHaveLength(1);
@@ -164,7 +164,7 @@ test("Person with two times the same relative is serialized correctly", async ()
     // Given
     let person1 = new Person();
     let person2 = new Person();
-    
+
     person1.relatives.push(person2);
     person1.relatives.push(person2);
 
@@ -173,13 +173,13 @@ test("Person with two times the same relative is serialized correctly", async ()
 
     // Then
     let walker = new Walker(serialized);
-    walker.expectBasics();    
+    walker.expectBasics();
 
     walker.follow(walker.value().relatives);
     expect(walker.value()).toHaveLength(2);
     expect(walker.value()[0]).toBeRef();
     expect(walker.value()[1]).toBeRef();
-    
+
     expect(walker.value()[0].$ref).toBe(walker.value()[1].$ref);
 });
 
@@ -193,10 +193,10 @@ test("Person with cat is serialized correctly", async () => {
 
     // Then
     let walker = new Walker(serialized);
-    walker.expectBasics();    
+    walker.expectBasics();
 
     expect(walker.value().pet).toBeRef();
-    
+
     walker.follow(walker.value().pet);
     expect(walker.name()).toBe("Cat");
     expect(walker.value().name).toBe("Sammie");
@@ -213,10 +213,10 @@ test("A blob is serialized correctly", async () => {
 
     // Then
     let walker = new Walker(serialized);
-    walker.expectBasics();    
+    walker.expectBasics();
 
     expect(walker.value().image).toBeRef();
-    
+
     walker.follow(walker.value().image);
     expect(walker.name()).toBe("$plugin");
     expect(walker.value()).toEqual({
@@ -256,26 +256,26 @@ test("Circular objects are serialized correctly", async () => {
     // Given
     let person = new Person();
     let cat = new Cat("Sammie");
-    
+
     person.pet = cat;
     cat.owner = person;
-    
+
     // When
     let serialized = await serializer.serialize(person);
-    
+
     // Then
     let walker = new Walker(serialized);
     walker.expectBasics();
-    
+
     let personId = walker.id();
     expect(walker.value().pet).toBeRef();
     let catRef = walker.value().pet.$ref;
-    
+
     walker.follow(walker.value().pet);
     let petId = walker.id();
     expect(walker.value().owner).toBeRef();
     let ownerRef = walker.value().owner.$ref;
-    
+
     expect(ownerRef).toBe(personId);
     expect(catRef).toBe(petId);
 });

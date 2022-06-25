@@ -2,7 +2,7 @@ import Serializable from "./src/decorators/Serializable";
 import Serializer from "./src/classes/Serializer";
 let d = {};
 
-@Serializable("i")
+@Serializable("i", () => [Cat])
 class Person {
     name: string;
     pet: Cat;
@@ -12,25 +12,23 @@ class Person {
         d,
     };
     arr = []
-    
+
     constructor(name: string) {
         this.name = name;
     }
 }
 
-@Serializable("Cat", [Person])
+// @Serializable("Cat", () => [Person])
 class Cat {
     owner: Person;
     name: string;
-    
+
     constructor(name: string) {
         this.name = name;
     }
 }
 
 //@ts-ignore
-Person.addDependencies([Cat]);
-
 window.Person = Person;
 
 let serializer = new Serializer();
