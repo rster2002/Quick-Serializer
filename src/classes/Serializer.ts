@@ -30,11 +30,11 @@ export default class Serializer {
             value,
         }
     }
-    
+
     addPlugin(plugin: Plugin) {
         this.plugins.push(plugin);
     }
-    
+
     async serializeValue(value: any, onlyChildren = false) {
         if (value === null || value === undefined) {
             return value;
@@ -47,20 +47,20 @@ export default class Serializer {
                 $ref: entry.$id,
             };
         }
-        
+
         if (value instanceof Object) {
             let id = genId();
             let name;
             let serializedValue;
-            
+
             this.objects.set(value, {
                 $id: id,
                 $name: "$temp",
                 $value: null,
             });
-            
+
             let isSerializableClass = value.constructor !== undefined && value.constructor[serializableIndicatorSymbol];
-            
+
             if (isSerializableClass && !onlyChildren) {
                 name = value.constructor[labelSymbol];
                 serializedValue = await this.serializeSerializable(value);
@@ -71,13 +71,13 @@ export default class Serializer {
                 name = "$object";
                 serializedValue = await this.serializeObject(value);
             }
-            
+
             this.objects.set(value, {
                 $id: id,
                 $name: name,
                 $value: serializedValue,
             })
-            
+
             return { $ref: id };
         }
 
@@ -90,18 +90,18 @@ export default class Serializer {
                 $name: "$plugin",
                 $value: result.value,
             });
-            
+
             return { $ref: id };
         }
-        
+
         return value;
     }
-    
+
     private async serializeSerializable(value: object) {
         let classConstructor = Object.getPrototypeOf(Object.getPrototypeOf(value).constructor);
         return await this.serializeObject(value);
     }
-    
+
     private async serializeArray(value: unknown[]) {
         let items = [];
 
@@ -111,7 +111,7 @@ export default class Serializer {
 
         return items;
     }
-    
+
     private async serializeObject(value: object) {
         let meta = value[metaSymbol] ?? new ClassMeta();
         let mappedValues = [];
@@ -148,7 +148,7 @@ export default class Serializer {
             },
         }
     }
-    
+
     async deserialize(baseConstructor: Function, serializedResult: SerializationResult) {
         this.knownConstructors.clear();
         this.crawlConstructor(baseConstructor);
@@ -161,13 +161,13 @@ export default class Serializer {
         let createdObjectsById = new Map<string, unknown>();
         for (let serializedObject of serializedResult.objects) {
             let name = serializedObject.$name;
-            
+
             if (name === "$object") {
                 createdObjectsById.set(serializedObject.$id, {
                     //@ts-ignore
                     ...serializedObject.$value,
                 });
-                
+
                 continue;
             }
 
@@ -179,9 +179,9 @@ export default class Serializer {
 
                 continue;
             }
-            
+
             let constructor = nameConstructorMap.get(name);
-            
+
             if (constructor === undefined) {
                 throw new Error(`Missing constructor for '${serializedObject.$id}' (missing constructor with name '${serializedObject.$name}')`);
             }
@@ -190,7 +190,7 @@ export default class Serializer {
             for (let [key, value] of Object.entries(serializedObject.$value)) {
                 object[key] = value;
             }
-            
+
             createdObjectsById.set(serializedObject.$id, object)
         }
 
@@ -199,32 +199,37 @@ export default class Serializer {
 
             for (let key of Object.keys(object)) {
                 let value = object[key];
-                
+
                 if (this.isRef(value)) {
                     let refId = value.$ref;
                     object[key] = createdObjectsById.get(refId);
                 }
             }
         }
-        
+
         return createdObjectsById.get(serializedResult.value.$ref);
     }
-    
+
     private crawlConstructor(constructor: Function) {
         this.knownConstructors.add(constructor);
-        
-        if (constructor[dependenciesSymbol]) {
-            for (let dependencyConstructor of constructor[dependenciesSymbol]) {
-                if (!this.knownConstructors.has(dependencyConstructor)) {
-                    this.crawlConstructor(dependencyConstructor);
+
+        let dependencyFunctions = constructor[dependenciesSymbol];
+        if (dependencyFunctions) {
+            for (let dependencyFunction of dependencyFunctions) {
+                let dependencies = dependencyFunction();
+
+                for (let dependencyConstructor of dependencies) {
+                    if (!this.knownConstructors.has(dependencyConstructor)) {
+                        this.crawlConstructor(dependencyConstructor);
+                    }
                 }
             }
         }
     }
-    
+
     private isRef(value: unknown) {
         return typeof value === "object"
-            && value !== null 
+            && value !== null
             && Object.keys(value).length === 1
             //@ts-ignore
             && typeof value.$ref === "string";

@@ -42,3 +42,6 @@ yarn.lock
 
 # Template
 www/out.js
+**/*.map
+**/*.d.ts
+src/**/*.js

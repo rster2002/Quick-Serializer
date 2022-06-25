@@ -1,20 +1,19 @@
 import { Constructor } from "../types";
 import { dependenciesSymbol, labelSymbol, serializableIndicatorSymbol, serializerSymbol } from "../symbols";
 
-export default function Serializable(label: string, dependencies: Function[] = []) {
+export default function Serializable(label: string, dependencies?: () => Function[]) {
     return function<T extends Constructor>(constructor: T) {
-        let parentDependencies = constructor[dependenciesSymbol] ?? [];
-        
+        let currentDependencies = constructor[dependenciesSymbol] ?? new Set();
+
         constructor[labelSymbol] = label;
-        constructor[dependenciesSymbol] = [...dependencies, ...parentDependencies];
-        constructor[serializableIndicatorSymbol] = true;
-        
-        //@ts-ignore
-        constructor.addDependencies = function (dependencies: Function[]) {
-            constructor[dependenciesSymbol] = [
-                ...constructor[dependenciesSymbol],
-                ...dependencies,
-            ];
+
+        currentDependencies.add(() => [constructor]);
+        if (dependencies) {
+            currentDependencies.add(dependencies);
         }
+
+        constructor[dependenciesSymbol] = currentDependencies;
+
+        constructor[serializableIndicatorSymbol] = true;
     }
 }
