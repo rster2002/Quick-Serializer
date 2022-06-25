@@ -1,6 +1,6 @@
 {
   "name": "quick-serializer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rster2002/typescript-esbuild.git"
+    "url": "git+https://github.com/rster2002/Quick-Serializer.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rster2002/typescript-esbuild/issues"
+    "url": "https://github.com/rster2002/Quick-Serializer/issues"
   },
-  "homepage": "https://github.com/rster2002/typescript-esbuild#readme",
+  "homepage": "https://github.com/rster2002/Quick-Serializer#readme",
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/plugin-proposal-decorators": "^7.17.12",

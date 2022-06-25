@@ -3,7 +3,15 @@
 Quick serializer is a library that allows you to quickly serialize and deserialize classes to and from JSON representations. This
 JSON can then be stored somewhere like localstorage.
 
-## Basic usage
+## Installation
+
+To install quick serializer use NPM:
+
+```bash
+npm install quick-serializer
+```
+
+## Usage
 
 To get started, add the `Serializable` decorator to the class you want to serialize:
 
